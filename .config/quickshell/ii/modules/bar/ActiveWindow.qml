@@ -11,11 +11,10 @@ import Quickshell.Hyprland
 Item {
     id: root
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(root.QsWindow.window?.screen)
-    readonly property Toplevel activeWindow: ToplevelManager.activeToplevel
-
-    property string activeWindowAddress: `0x${activeWindow?.HyprlandToplevel?.address}`
-    property bool focusingThisMonitor: HyprlandData.activeWorkspace?.monitor == monitor?.name
-    property var biggestWindow: HyprlandData.biggestWindowForWorkspace(HyprlandData.monitors[root.monitor?.id]?.activeWorkspace.id)
+    readonly property HyprlandToplevel activeWindow: Hyprland.activeToplevel
+    property string activeWindowAddress: activeWindow?.address
+    property bool focusingThisMonitor: monitor.focused
+    property var biggestWindow: HyprlandData.biggestWindowForWorkspace(Hyprland.focusedWorkspace.id)
 
     implicitWidth: colLayout.implicitWidth
 
@@ -32,10 +31,7 @@ Item {
             font.pixelSize: Appearance.font.pixelSize.smaller
             color: Appearance.colors.colSubtext
             elide: Text.ElideRight
-            text: root.focusingThisMonitor && root.activeWindow?.activated && root.biggestWindow ? 
-                root.activeWindow?.appId :
-                (root.biggestWindow?.class) ?? Translation.tr("Desktop")
-
+            text: root.focusingThisMonitor && root.activeWindow?.activated && root.biggestWindow ? root.activeWindow?.wayland?.appId : (root.biggestWindow?.class) ?? Translation.tr("Desktop")
         }
 
         StyledText {
@@ -43,11 +39,7 @@ Item {
             font.pixelSize: Appearance.font.pixelSize.small
             color: Appearance.colors.colOnLayer0
             elide: Text.ElideRight
-            text: root.focusingThisMonitor && root.activeWindow?.activated && root.biggestWindow ? 
-                root.activeWindow?.title :
-                (root.biggestWindow?.title) ?? `${Translation.tr("Workspace")} ${monitor?.activeWorkspace?.id ?? 1}`
+            text: root.focusingThisMonitor && root.activeWindow?.activated && root.biggestWindow ? root.activeWindow?.wayland?.title : (root.biggestWindow?.title) ?? `${Translation.tr("Workspace")} ${root.monitor?.activeWorkspace?.id ?? 1}`
         }
-
     }
-
 }
